@@ -62,32 +62,32 @@ app.get('/get-entity-rows', async (req, res) => {
 });
 
 app.post('/add-data-row-to-entity', async (req, res) => {
-    const { tableName, data } : {tableName : string, data : string[]} = req.body;
+    const { tableName, data } : {tableName : string, data : {[key: string]: string}} = req.body;
   
     if (!tableName || !data) {
       return res.status(400).json({ error: 'tableName and data are required' });
     }
-
+  
     try {
-        const columnsString = data.join(', ');
-        const queryString = `INSERT INTO ${tableName} VALUES (${columnsString})`;
-        const result = await executeQuery(queryString);        
-        // console.log(result);
-        if(result.rowCount !== null && result.rowCount > 0) {
-            return res.status(200).json({success : "Data added successfully"});
-        }
-        else{
-            throw new Error('Unable to add. Check if table name is correct and data is in format');
-        }
+      const columnsString = Object.keys(data).join(', ');
+      const valuesString = Object.values(data).map(value => `'${value}'`).join(', ');
+      const queryString = `INSERT INTO ${tableName} (${columnsString}) VALUES (${valuesString})`;
+      const result = await executeQuery(queryString);        
+      // console.log(result);
+      if(result.rowCount !== null && result.rowCount > 0) {
+        return res.status(200).json({success : "Data added successfully"});
+      }
+      else{
+        throw new Error('Unable to add. Check if table name is correct and data is in format');
+      }
     } catch (error : any ) {
-        if(error?.message){
-            return res.status(200).send(error.message);
-        }        
-        res.sendStatus(500);
-        console.trace(error);
-        return;
+      if(error?.message){
+        return res.status(500).send(error.message);
+      }        
+      res.sendStatus(500);
+      console.trace(error);
     }
-})
+});
 
 app.get('/get-schema', async (req, res) => {
     // url/get-schema?entity=users
