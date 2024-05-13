@@ -123,12 +123,11 @@ app.get('/get-schema', async (req, res) => {
 
 // To update a particular row in a table
 app.put('/update-entity-row', async (req, res) => {
-    const { tableName, data, primaryKeyValue } : {tableName : string, data : string[], primaryKeyValue : string} = req.body;
+    const { tableName, data, primaryKeyValue } : {tableName : string, data : {[key: string]: string}, primaryKeyValue : string} = req.body;
     if(!tableName || !data || !primaryKeyValue){
         return res.sendStatus(400);
     }
-    try {
-        const columnsString = data.join(', ');    
+    try { 
         const queryString = `
             SELECT a.attname as column_name
             FROM   pg_index i
@@ -140,7 +139,8 @@ app.put('/update-entity-row', async (req, res) => {
         const result = await executeQuery(queryString);        
         if(result.rowCount !== null && result.rowCount > 0){
             const primaryKeyName = result?.rows[0].column_name;
-            const newQueryString = `UPDATE ${tableName} SET ${columnsString} WHERE ${primaryKeyName} = ${primaryKeyValue}`;
+            const setString = Object.entries(data).map(([key, value]) => `${key}='${value}'`).join(', ');
+            const newQueryString = `UPDATE ${tableName} SET ${setString} WHERE ${primaryKeyName} = '${primaryKeyValue}'`;
             const newResult = await executeQuery(newQueryString);   
             if(newResult.rowCount === 0){
                 return res.sendStatus(404);
