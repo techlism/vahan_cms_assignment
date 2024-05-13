@@ -161,7 +161,8 @@ app.put('/update-entity-row', async (req, res) => {
 
 // to delete a single row from a table/entity
 app.delete('/delete-entity-row', async (req, res) => {
-    const { tableName, primaryKeyValue } : {tableName : string, primaryKeyValue : string} = req.body;
+    const tableName = req.query.entity as string;
+    const primaryKeyValue = req.query.primaryKeyValue as string;
     if(!tableName || !primaryKeyValue){
         return res.sendStatus(400);
     }
@@ -228,28 +229,7 @@ app.get('/get-primary-key',async (req,res)=>{
         return;
     }
 });
-// to drop entire entity
-app.delete('/delete-entity', async (req,res)=>{
-    const tableName = req.query.entity as string;
-    if(!tableName) return res.sendStatus(400);
-    try {
-        const queryString = `DROP TABLE IF EXISTS ${tableName} ;` ;
-        console.log(queryString);
-        const result = await executeQuery(queryString);
-        // console.log(result);
-        // A temporary-workaround, for more robust checking, it should be rechecked with DB
-        if(result.command === 'DROP') {
-            return res.sendStatus(200);
-        }
-        else return res.sendStatus(404);
-    } catch (error : any) {
-        if(error?.message){
-            return res.status(500).send(error.message);
-        }
-        console.trace(error);
-        return res.sendStatus(500);
-    }
-});
+
 
 app.get('/all-entities',async (req,res)=>{
     try {
