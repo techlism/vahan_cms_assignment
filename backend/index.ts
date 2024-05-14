@@ -163,7 +163,7 @@ app.put('/update-entity-row', async (req, res) => {
 // to delete a single row from a table/entity
 app.delete('/delete-entity-row', async (req, res) => {
     const tableName = req.query.entity as string;
-    const primaryKeyValue = req.query.primaryKeyValue as string;
+    const primaryKeyValue = req.query.primaryKeyValue;
     if(!tableName || !primaryKeyValue){
         return res.sendStatus(400);
     }
@@ -180,7 +180,7 @@ app.delete('/delete-entity-row', async (req, res) => {
         const result = await executeQuery(queryString);       
         console.log(result) ;
         if(result.rowCount !== null && result.rowCount > 0){
-            const primaryKeyName = result?.rows[0].column_name;
+            const primaryKeyName : string = result?.rows[0].column_name;
             const newQueryString = `DELETE FROM ${tableName} WHERE ${primaryKeyName} = ${primaryKeyValue}`;
             const newResult = await executeQuery(newQueryString);   
             if(newResult.rowCount === 0){
