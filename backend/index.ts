@@ -124,6 +124,7 @@ app.get('/get-schema', async (req, res) => {
 // To update a particular row in a table
 app.put('/update-entity-row', async (req, res) => {
     const { tableName, data, primaryKeyValue } : {tableName : string, data : {[key: string]: string}, primaryKeyValue : string} = req.body;
+    console.log(tableName, data, primaryKeyValue);
     if(!tableName || !data || !primaryKeyValue){
         return res.sendStatus(400);
     }
