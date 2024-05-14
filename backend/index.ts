@@ -164,6 +164,7 @@ app.put('/update-entity-row', async (req, res) => {
 app.delete('/delete-entity-row', async (req, res) => {
     const tableName = req.query.entity as string;
     const primaryKeyValue = req.query.primaryKeyValue;
+    console.log(tableName, primaryKeyValue);
     if(!tableName || !primaryKeyValue){
         return res.sendStatus(400);
     }
