@@ -24,20 +24,16 @@ export default function EntityTable({rows, schema, selectedEntity, setAllRows, f
             console.log(error);
         }                
     }
-    async function deleteRow(rowIndex : number) { // Working
-        const row = rows[rowIndex];
+    async function deleteRow(rowIndex : number) { // Working       
         if(primaryKey === ''){
             await getPrimaryKey();
         }
-        const primaryKeyValue = row[primaryKey];
+        const primaryKeyValue = rows[rowIndex][primaryKey];
         try {
             const response = await axios.delete(`${baseURL}/delete-entity-row?entity=${selectedEntity}&primaryKeyValue=${primaryKeyValue}`);
+            console.log(response);
             if(response.status === 200){
-                setAllRows((prevRows) => {
-                    const newRows = [...prevRows];
-                    newRows.splice(rowIndex, 1);
-                    return newRows;
-                });
+                await fetchAllRows();
                 setStatusMsg('Row deleted successfully');
                 setTimeout(() => {
                     setStatusMsg('');
